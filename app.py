@@ -4,6 +4,9 @@ from lumaai import LumaAI
 from dotenv import load_dotenv
 import os
 import json
+import time
+import random
+
 
 load_dotenv()
 
@@ -76,6 +79,8 @@ def filter_videos():
     if not txt or txt not in dct:
         return create_custom_response({'error': 'Invalid text'}, 400)
     else:
+        delay = random.uniform(7.5, 12.5)
+        time.sleep(delay)
         return create_custom_response({'url': dct[txt]})
 
 if __name__ == '__main__':
