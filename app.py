@@ -33,15 +33,27 @@ def require_api_key(f):
 def text_to_video():
     #get the "text" from the request json
     txt = request.json.get('text')
+    start_frame = request.json.get('start_frame')
     if not txt:
         return create_custom_response({'error': 'Missing "text" in request body'}, 400)
     try:
         client = LumaAI(
             auth_token=os.environ.get("LUMAAI_API_KEY"),
         )
-        generation = client.generations.create(
-            prompt=txt,
-        )
+        if not start_frame:
+            generation = client.generations.create(
+                prompt=txt,
+            )
+        else:
+            generation = client.generations.create(
+                prompt=txt,
+                keyframes={
+                "frame0": {
+                    "type": "image",
+                    "url": start_frame
+                }
+                }
+            )
         id = generation.id
         while generation.state != 'completed':
             generation = client.generations.get(id)
