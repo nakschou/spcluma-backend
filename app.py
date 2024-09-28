@@ -23,7 +23,6 @@ def require_api_key(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         api_key = request.json.get('api_key')
-        print(api_key)
         if not api_key or api_key != os.environ.get("OUR_API_KEY"):       
             return create_custom_response({"error": "Invalid API key"}, 403)
         return f(*args, **kwargs)
