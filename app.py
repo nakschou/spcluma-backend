@@ -10,6 +10,10 @@ load_dotenv()
 app = Flask(__name__)
 api_key = os.environ.get("OUR_API_KEY")
 
+dct = {
+    "hawaii": "https://storage.cdn-luma.com/lit_lite_inference_v1.6-xl/8c60fedd-e5dd-4ff9-a73b-75656951d393/9e638e85-ce84-4f3f-8b2a-5ef5b20e3955_video02646ea6f897542689b259f573b3f0b31.mp4",
+    "hongkong": "https://storage.cdn-luma.com/lit_lite_inference_v1.6-xl/b4be73bd-48b1-483b-b5c1-9f70768da411/8318dded-9dba-435d-aefa-2604f69815f5_video0ff773ea00fdd4435988ed76e770bf912.mp4"}
+
 def create_custom_response(data, status_code=200, mimetype='application/json'):
     response = Response(
         response=json.dumps(data),
@@ -48,10 +52,10 @@ def text_to_video():
             generation = client.generations.create(
                 prompt=txt,
                 keyframes={
-                "frame0": {
-                    "type": "image",
-                    "url": start_frame
-                }
+                    "frame0": {
+                        "type": "image",
+                        "url": start_frame
+                    }
                 }
             )
         id = generation.id
@@ -61,6 +65,15 @@ def text_to_video():
         return create_custom_response({'url': vid_url})
     except Exception as e:
         return create_custom_response({'error': str(e)}, 500)
+
+@app.route('/filter_videos', methods=['POST'])
+def filter_videos():
+    #get the "text" from the request json
+    txt = request.json.get('location')
+    if not txt or txt not in dct:
+        return create_custom_response({'error': 'Invalid text'}, 400)
+    else:
+        return create_custom_response({'url': dct[txt]})
 
 if __name__ == '__main__':
     app.run(debug=True)
